@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-4.2.xsd
+           http://www.springframework.org/schema/tx
+		   http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		   http://www.springframework.org/schema/aop
+		   http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+">
+    <import resource="spring-data-dataSource.xml"/>
+
+    <!--<context:annotation-config></context:annotation-config>-->
+    <context:component-scan base-package="com.hjj"></context:component-scan>
+
+    <!-- <context:property-placeholder location="classpath*:db.properties" />	 -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath*:*.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 1.配置目标对象 -->
+    <bean name="userService" class="com.hjj.service.impl.UserServiceImpl"></bean>
+    <!-- 2.配置通知对象 -->
+    <bean name="myAdvice" class="com.hjj.MyAdviceAnno"></bean>
+    <!-- 3.注解配置 -->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+    <!-- 3.配置将通知织入切入点对象 xml方式 -->
+    <!--<aop:config>
+        <aop:pointcut expression="execution(* com.hjj.service..*.*(..))" id="pc"/>
+        <aop:aspect ref="myAdvice">
+            &lt;!&ndash; 指定为before方法作为前置通知 &ndash;&gt;
+            <aop:before method="before" pointcut-ref="pc"/>
+            &lt;!&ndash; 后置 &ndash;&gt;
+            <aop:after method="after" pointcut-ref="pc"/>
+            &lt;!&ndash; 环绕通知 &ndash;&gt;
+            <aop:around method="around" pointcut-ref="pc"/>
+            &lt;!&ndash; 异常拦截通知 &ndash;&gt;
+            <aop:after-throwing method="afterException" pointcut-ref="pc"/>
+            &lt;!&ndash; 后置 &ndash;&gt;
+            <aop:after-returning method="afterReturning" pointcut-ref="pc"/>
+        </aop:aspect>
+    </aop:config>-->
+
+    <!-- 构造注入 -->
+    <bean id="customer" class="com.hjj.Customer">
+        <constructor-arg name="name" value="tom"></constructor-arg>
+        <constructor-arg name="age" value="23"></constructor-arg>
+        <constructor-arg name="contact" ref="contactId"></constructor-arg>
+    </bean>
+    <!-- 属性注入 -->
+    <bean id = "contactId" class="com.hjj.Contact">
+        <property name="address" value="北京"/>
+        <property name="telphone" value="12345678"/>
+    </bean>
+
+
+</beans>
