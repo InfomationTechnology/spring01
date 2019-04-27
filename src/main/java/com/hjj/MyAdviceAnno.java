@@ -26,37 +26,37 @@ import org.aspectj.lang.annotation.*;
 @Aspect
 public class MyAdviceAnno {
 
-    @Pointcut("execution(* com.hjj..*.*(..))")
+    @Pointcut("execution(* com.hjj..*ServiceImpl.*(..))")
     public void pc() {}
 
     //前置通知
     //指定方法是前置通知，并制定切入点
     @Before("MyAdviceAnno.pc()")
     public void before() {
-        System.out.println("这是前置通知！");
+        System.out.println("这是前置通知1！");
     }
     //后置通知
-    @AfterReturning("execution(* com.hjj..*.*(..))")
+    @AfterReturning("execution(* com.hjj..*ServiceImpl.*(..))")
     public void afterReturning() {
-        System.out.println("这是后置通知(如果出现异常不会调用)");
+        System.out.println("这是后置通知1(如果出现异常不会调用)");
     }
     //环绕通知
-    @Around("execution(* com.hjj..*.*(..))")
+    @Around("execution(* com.hjj..*ServiceImpl.*(..))")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        System.out.println("这是环绕通知之前的部分！");
+        System.out.println("这是环绕通知之前的部分1！");
         Object proceed = pjp.proceed();
-        System.out.println("这是环绕通知之后的部分！");
+        System.out.println("这是环绕通知之后的部分1！");
         return proceed;
     }
     //异常通知
-    @AfterThrowing("execution(* com.hjj..*.*(..))")
+    @AfterThrowing("execution(* com.hjj..*ServiceImpl.*(..))")
     public void afterException() {
-        System.out.println("异常出现了！");
+        System.out.println("异常出现了1！");
     }
     //后置通知
-    @After("execution(* com.hjj..*.*(..))")
+    @After("execution(* com.hjj..*ServiceImpl.*(..))")
     public void after() {
-        System.out.println("这是后置通知(出现异常也会调用)");
+        System.out.println("这是后置通知1(出现异常也会调用)");
     }
 
 }

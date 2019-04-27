@@ -14,64 +14,68 @@
 		   http://www.springframework.org/schema/aop
 		   http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
 ">
-    <!-- 1.将连接池放入spring容器中 -->
+
+    <!-- druid 数据源 -->
+    <bean id="dataSourceDruid" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <!-- 基本属性 url、user、password -->
+        <property name="driverClassName" value="${jdbc.driverClass}" />
+        <property name="url" value="${jdbc.jdbcUrl}" />
+        <property name="username" value="${jdbc.user}" />
+        <property name="password" value="${jdbc.password}" />
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters" value="stat" />
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="maxActive" value="20" />
+        <property name="initialSize" value="1" />
+        <property name="minIdle" value="1" />
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000" />
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="true" />
+        <property name="maxOpenPreparedStatements" value="20" />
+    </bean>
+
+    <!-- 1.将连接池放入spring容器中 c3p0数据源 -->
     <bean name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="jdbcUrl" value="${jdbc.jdbcUrl}"></property>
         <property name="driverClass" value="${jdbc.driverClass}"></property>
         <property name="user" value="${jdbc.user}"></property>
         <property name="password" value="${jdbc.password}"></property>
+        <!--连接池中保留的最小连接数。-->
+        <property name="minPoolSize" value="${jdbc.minPoolSize}" />
+        <!--连接池中保留的最大连接数。Default: 15 -->
+        <property name="maxPoolSize" value="${jdbc.maxPoolSize}" />
+        <!--最大空闲时间,1800秒内未使用则连接被丢弃。若为0则永不丢弃。Default: 0 -->
+        <property name="maxIdleTime" value="${jdbc.maxIdleTime}" />
+        <!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
+        <property name="acquireIncrement" value="${jdbc.acquireIncrement}" />
+        <property name="maxStatements" value="${jdbc.maxStatements}" />
+        <property name="initialPoolSize" value="${jdbc.initialPoolSize}" />
+        <!--每60秒检查所有连接池中的空闲连接。Default: 0 -->
+        <property name="idleConnectionTestPeriod" value="${jdbc.idleConnectionTestPeriod}" />
+        <!--定义在从数据库获取新连接失败后重复尝试的次数。Default: 30 -->
+        <property name="acquireRetryAttempts" value="${jdbc.acquireRetryAttempts}" />
+        <property name="breakAfterAcquireFailure" value="${jdbc.breakAfterAcquireFailure}" />
+        <property name="testConnectionOnCheckout" value="${jdbc.testConnectionOnCheckout}" />
     </bean>
     <!-- 2.将JDBCTemplate放入spring容器中 -->
     <!--JDBCTemplate需要datasource连接池 -->
     <bean name="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <property name="dataSource" ref="dataSource"></property>
     </bean>
+
     <!-- 3.将UserDao放入spring容器中 -->
     <!--UserDaoIml需要jdbctemplate-->
     <bean name="userDao" class="com.hjj.dao.impl.UserDaoIml">
         <!--<property name="jTemplate" ref="jdbcTemplate"></property>-->
         <property name="dataSource" ref="dataSource"></property>
-    </bean>
-    <!--事务核心管理器,封装了所有事务操作. 依赖于连接池  -->
-    <bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"></property>
-    </bean>
-
-    <!-- 配置事务通知 -->
-    <tx:advice id="txAdvice" transaction-manager="transactionManager">
-        <tx:attributes>
-            <!-- 以方法为单位,指定方法应用什么事务属性
-            isolation:隔离级别
-            propagation:传播行为
-            read-only:是否只读
-         -->
-            <tx:method name="transfer" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" /><!-- 指定方法 -->
-            <tx:method name="save*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" /><!--企业中一般使用如下通配符 -->
-            <tx:method name="persist*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
-            <tx:method name="update*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
-            <tx:method name="modify*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
-            <tx:method name="delete*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
-            <tx:method name="remove*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
-            <tx:method name="get*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="true" />
-            <tx:method name="find*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="true" />
-        </tx:attributes>
-    </tx:advice>
-    <!-- 配置织入 -->
-    <aop:config>
-        <!-- 配置切点表达式 -->
-        <aop:pointcut expression="execution(* com.hjj.service.*ServiceImpl.*(..))" id="txPc"/>
-        <!-- 配置切面 : 通知+切点
-            advice-ref:通知的名称
-            pointcut-ref:切点的名称
-     -->
-        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPc"/>
-    </aop:config>
-    <!-- 1.将连接池 -->
-    <bean name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" >
-        <property name="jdbcUrl" value="${jdbc.jdbcUrl}" ></property>
-        <property name="driverClass" value="${jdbc.driverClass}" ></property>
-        <property name="user" value="${jdbc.user}" ></property>
-        <property name="password" value="${jdbc.password}" ></property>
     </bean>
 
     <!-- 2.dao -->
@@ -82,4 +86,5 @@
     <bean name="accountService" class="com.hjj.service.impl.AccountServiceImpl">
         <property name="accountDao" ref="accountDao"></property>
     </bean>
+
 </beans>

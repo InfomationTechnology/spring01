@@ -1,6 +1,7 @@
 package com.hjj.service.impl;
 
 import com.hjj.service.UserService;
+import org.apache.log4j.Logger;
 
 /**
  * @Auther: HJJ
@@ -8,9 +9,13 @@ import com.hjj.service.UserService;
  * @Description:
  */
 public class UserServiceImpl implements UserService {
+
+    private static Logger logger = Logger.getLogger(UserServiceImpl.class);
+
     @Override
     public void save() {
-        System.out.println("保存");
+        logger.info("保存");
+//        System.out.println("保存");
     }
 
     @Override

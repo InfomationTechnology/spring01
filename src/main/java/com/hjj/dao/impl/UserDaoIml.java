@@ -2,6 +2,7 @@ package com.hjj.dao.impl;
 
 import com.hjj.dao.UserDao;
 import com.hjj.model.User;
+import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -17,6 +18,7 @@ import java.util.List;
  */
 //使用JDBC模板实现增删改查
 public class UserDaoIml  extends JdbcDaoSupport implements UserDao {
+    private static Logger logger = Logger.getLogger(UserDaoIml.class);
 
     //并且给jTemplate设置setter方法
 //    private JdbcTemplate jTemplate;
@@ -25,7 +27,8 @@ public class UserDaoIml  extends JdbcDaoSupport implements UserDao {
     public void save(User u) {
         String sql="insert into t_user values(null,?,?)";
         super.getJdbcTemplate().update(sql, u.getName(),u.getAge());
-        System.out.println("保存成功");
+        logger.info("保存成功");
+//        System.out.println("保存成功");
     }
 
     @Override
