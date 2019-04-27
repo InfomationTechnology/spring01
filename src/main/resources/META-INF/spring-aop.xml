@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-4.2.xsd
+           http://www.springframework.org/schema/tx
+		   http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		   http://www.springframework.org/schema/aop
+		   http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+">
+
+    <!-- 构造注入 -->
+    <bean id="customer" class="com.hjj.Customer">
+        <constructor-arg name="name" value="tom"></constructor-arg>
+        <constructor-arg name="age" value="23"></constructor-arg>
+        <constructor-arg name="contact" ref="contactId"></constructor-arg>
+    </bean>
+    <!-- 属性注入 -->
+    <bean id = "contactId" class="com.hjj.Contact">
+        <property name="address" value="北京"/>
+        <property name="telphone" value="12345678"/>
+    </bean>
+
+    <!-- 1.配置目标对象 -->
+    <bean name="userService" class="com.hjj.service.impl.UserServiceImpl"></bean>
+    <!-- 2.配置通知对象 -->
+    <bean name="myAdvice" class="com.hjj.MyAdviceAnno"></bean>
+
+    <!-- 3.注解配置 Aop -->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+    <!-- 3.配置将通知织入切入点对象 xml方式 -->
+    <!--<aop:config>
+        <aop:pointcut expression="execution(* com.hjj.service..*.*(..))" id="pc"/>
+        <aop:aspect ref="myAdvice">
+            &lt;!&ndash; 指定为before方法作为前置通知 &ndash;&gt;
+            <aop:before method="before" pointcut-ref="pc"/>
+            &lt;!&ndash; 后置 &ndash;&gt;
+            <aop:after method="after" pointcut-ref="pc"/>
+            &lt;!&ndash; 环绕通知 &ndash;&gt;
+            <aop:around method="around" pointcut-ref="pc"/>
+            &lt;!&ndash; 异常拦截通知 &ndash;&gt;
+            <aop:after-throwing method="afterException" pointcut-ref="pc"/>
+            &lt;!&ndash; 后置 &ndash;&gt;
+            <aop:after-returning method="afterReturning" pointcut-ref="pc"/>
+        </aop:aspect>
+    </aop:config>-->
+
+
+    <!-- 开启使用注解管理aop事务
+    在要加事务的方法上加@Transactional(isolation=Isolation.REPEATABLE_READ,propagation=Propagation.REQUIRED,readOnly=false)
+    并且注释掉下面的<aop:config>配置
+    -->
+    <tx:annotation-driven/>
+
+
+    <!--事务核心管理器,封装了所有事务操作. 依赖于连接池  -->
+    <bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 配置事务通知 xml方式-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 以方法为单位,指定方法应用什么事务属性
+            isolation:隔离级别
+            propagation:传播行为
+            read-only:是否只读
+         -->
+            <tx:method name="transfer" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" /><!-- 指定方法 -->
+            <tx:method name="save*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" /><!--企业中一般使用如下通配符 -->
+            <tx:method name="persist*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+            <tx:method name="update*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+            <tx:method name="modify*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+            <tx:method name="delete*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+            <tx:method name="remove*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+            <tx:method name="get*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="true" />
+            <tx:method name="find*" isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="true" />
+        </tx:attributes>
+    </tx:advice>
+    <!-- 配置织入 -->
+    <aop:config>
+        <!-- 配置切点表达式 -->
+        <aop:pointcut expression="execution(* com.hjj..*ServiceImpl.*(..))" id="txPc"/>
+        <!-- 配置切面 : 通知+切点
+            advice-ref:通知的名称
+            pointcut-ref:切点的名称
+     -->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPc"/>
+    </aop:config>
+
+</beans>
