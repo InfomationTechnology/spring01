@@ -1,4 +1,4 @@
-package com.hjj.dao;
+package com.hjj.dao.jdbcTemplate;
 
 import com.hjj.model.User;
 

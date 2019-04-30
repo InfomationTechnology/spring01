@@ -1,54 +1,63 @@
-package com.hjj.dao.impl;
+package com.hjj.dao.jdbcTemplate.impl;
 
-import com.hjj.dao.UserDao;
+import com.hjj.dao.jdbcTemplate.UserDao;
 import com.hjj.model.User;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Auther: HJJ
  * @Date: 2019/04/23 15:25
- * @Description:
+ * @Description: JdbcTemplate  注解方式
  */
 //使用JDBC模板实现增删改查
-public class UserDaoIml  extends JdbcDaoSupport implements UserDao {
-    private static Logger logger = Logger.getLogger(UserDaoIml.class);
+@Repository(value = "userDao")
+public class UserDaoImpl implements UserDao {
+    private static Logger logger = Logger.getLogger(UserDaoImpl.class);
 
-    //并且给jTemplate设置setter方法
-//    private JdbcTemplate jTemplate;
+    //xml方式要给jdbcTemplate设置setter方法
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
 
     @Override
     public void save(User u) {
         String sql="insert into t_user values(null,?,?)";
-        super.getJdbcTemplate().update(sql, u.getName(),u.getAge());
+        getJdbcTemplate().update(sql, u.getName(),u.getAge());
+
         logger.info("保存成功");
-//        System.out.println("保存成功");
     }
 
     @Override
     public void delete(Integer id) {
         String sql="delete from t_user where id=?";
-        super.getJdbcTemplate().update(sql, id);
+        getJdbcTemplate().update(sql, id);
         System.out.println("删除成功");
     }
 
     @Override
     public void update(User u) {
         String sql="update t_user set name=? where id=?";
-        super.getJdbcTemplate().update(sql, u.getName(),u.getId());
+        getJdbcTemplate().update(sql, u.getName(),u.getId());
         System.out.println("修改成功");
     }
 
     @Override
     public User getById(Integer id) {
         String sql="select * from t_user where id=?";
-        return super.getJdbcTemplate().queryForObject(sql, new RowMapper<User>() {
+        JdbcTemplate jdbcTemplate = getJdbcTemplate();
+        return jdbcTemplate.queryForObject(sql, new RowMapper<User>() {
 
             @Override
             public User mapRow(ResultSet rs, int arg1) throws SQLException {
@@ -63,14 +72,14 @@ public class UserDaoIml  extends JdbcDaoSupport implements UserDao {
     @Override
     public int getTotalCount() {
         String sql="select count(*) from t_user";
-        Integer count = super.getJdbcTemplate().queryForObject(sql, Integer.class);
+        Integer count = getJdbcTemplate().queryForObject(sql, Integer.class);
         return count;
     }
 
     @Override
     public List<User> getAll() {
         String sql="select * from t_user";
-        return super.getJdbcTemplate().query(sql,new RowMapper<User>() {
+        return getJdbcTemplate().query(sql,new RowMapper<User>() {
 
             @Override
             public User mapRow(ResultSet rs, int arg1) throws SQLException {
@@ -82,7 +91,13 @@ public class UserDaoIml  extends JdbcDaoSupport implements UserDao {
             }});
     }
 
-    /*public void setjTemplate(JdbcTemplate jTemplate) {
-        this.jTemplate = jTemplate;
+
+
+    private JdbcTemplate getJdbcTemplate(){
+        return jdbcTemplate;
+    }
+
+    /*public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }*/
 }

@@ -1,21 +1,29 @@
 package com.hjj.service.impl;
 
+
+import com.hjj.dao.mybatis.UserDao;
+import com.hjj.model.User;
 import com.hjj.service.UserService;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @Auther: HJJ
  * @Date: 2019/04/22 16:40
- * @Description:
+ * @Description: 注解方式
  */
+@Service
 public class UserServiceImpl implements UserService {
 
     private static Logger logger = Logger.getLogger(UserServiceImpl.class);
 
+    @Autowired
+    private UserDao userDao;
+
     @Override
     public void save() {
         logger.info("保存");
-//        System.out.println("保存");
     }
 
     @Override
@@ -29,7 +37,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void find() {
-        System.out.println("查找");
+    public User find(int id) {
+        logger.info("查找");
+        return userDao.getById(id);
     }
 }

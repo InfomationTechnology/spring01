@@ -1,9 +1,7 @@
 package com.hjj;
 
-import com.hjj.dao.UserDao;
+import com.hjj.dao.jdbcTemplate.UserDao;
 import com.hjj.model.User;
-import com.hjj.service.UserService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +21,8 @@ public class JdbcTemplateTest
 
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private UserDao userDaoSupport;
 
     @Test
     public void save()
@@ -46,8 +46,10 @@ public class JdbcTemplateTest
     @Test
     public void findById()
     {
-        User u = userDao.getById(1);
-        System.out.println(u);
+        User u1 = userDaoSupport.getById(3);
+        User u2 = userDao.getById(3);
+        System.out.println(u1);
+        System.out.println(u2);
     }
 
     @Test

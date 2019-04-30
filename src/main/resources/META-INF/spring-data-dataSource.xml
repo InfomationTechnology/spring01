@@ -65,6 +65,32 @@
         <property name="breakAfterAcquireFailure" value="${jdbc.breakAfterAcquireFailure}" />
         <property name="testConnectionOnCheckout" value="${jdbc.testConnectionOnCheckout}" />
     </bean>
+
+    <!-- sql会话模版 -->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+    </bean>
+
+    <!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- 加载mybatis的全局配置文件 -->
+        <property name="configLocation" value="classpath:META-INF/mybatis-config.xml"></property>
+        <!-- 自动扫描mapping.xml文件，**表示迭代查找 -->
+        <property name="mapperLocations" value="classpath:mybatis/*.xml" />
+    </bean>
+
+    <bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+        <property name="mapperInterface" value="com.hjj.dao.mybatis.AccountMapper"/>
+    </bean>
+
+    <!--映射器接口 DAO接口所在包名，Spring会自动查找其下的类 ,包下的类需要使用@MapperScan注解,否则容器注入会失败 -->
+    <!--<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.hjj.dao.mybatis.AccountMapper" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>-->
+
     <!-- 2.将JDBCTemplate放入spring容器中 -->
     <!--JDBCTemplate需要datasource连接池 -->
     <bean name="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
@@ -73,13 +99,13 @@
 
     <!-- 3.将UserDao放入spring容器中 -->
     <!--UserDaoIml需要jdbctemplate-->
-    <bean name="userDao" class="com.hjj.dao.impl.UserDaoIml">
-        <!--<property name="jTemplate" ref="jdbcTemplate"></property>-->
+    <!--<bean name="userDao" class="com.hjj.dao.jdbcTemplate.impl.UserDaoImpl">
+        &lt;!&ndash;<property name="jdbcTemplate" ref="jdbcTemplate"></property>&ndash;&gt;
         <property name="dataSource" ref="dataSource"></property>
-    </bean>
+    </bean>-->
 
     <!-- 2.dao -->
-    <bean name="accountDao" class="com.hjj.dao.impl.AccountDaoImpl">
+    <bean name="accountDao" class="com.hjj.dao.jdbcTemplate.impl.AccountDaoImpl">
         <property name="dataSource" ref="dataSource"></property>
     </bean>
     <!-- 3.service -->

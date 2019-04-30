@@ -1,12 +1,12 @@
-package com.hjj.dao.impl;
+package com.hjj.dao.jdbcTemplate.impl;
 
-import com.hjj.dao.AccountDao;
+import com.hjj.dao.jdbcTemplate.AccountDao;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 /**
  * @Auther: HJJ
  * @Date: 2019/04/23 16:58
- * @Description:
+ * @Description:xml配置 bean dataSource方式
  */
 public class AccountDaoImpl extends JdbcDaoSupport implements AccountDao {
 

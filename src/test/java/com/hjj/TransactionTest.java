@@ -27,7 +27,7 @@ public class TransactionTest {
     @Test
     public void tranTest(){
         //遇到异常则回滚
-        accountService.transfer(1,2,100d);
+        accountService.transfer(2,1,100d);
     }
 
     @Test

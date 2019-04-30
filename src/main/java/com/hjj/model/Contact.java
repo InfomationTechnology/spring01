@@ -1,4 +1,4 @@
-package com.hjj;
+package com.hjj.model;
 
 /**
  * @Auther: HJJ

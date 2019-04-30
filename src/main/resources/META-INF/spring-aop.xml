@@ -16,13 +16,13 @@
 ">
 
     <!-- 构造注入 -->
-    <bean id="customer" class="com.hjj.Customer">
+    <bean id="customer" class="com.hjj.model.Customer">
         <constructor-arg name="name" value="tom"></constructor-arg>
         <constructor-arg name="age" value="23"></constructor-arg>
         <constructor-arg name="contact" ref="contactId"></constructor-arg>
     </bean>
     <!-- 属性注入 -->
-    <bean id = "contactId" class="com.hjj.Contact">
+    <bean id = "contactId" class="com.hjj.model.Contact">
         <property name="address" value="北京"/>
         <property name="telphone" value="12345678"/>
     </bean>
